@@ -1,0 +1,13 @@
+{
+  "accountId": "demo_account", "startedAt": "2026-01-01T00:00:00+00:00",
+  "profile": {"displayName": "示例创作者", "followers": 1200, "works": 2, "bio": "完全虚构的离线演示账号"},
+  "source": {"provider": "offline-demo", "worksFetched": 2, "commentsFetched": 5, "commentLevel": "一级评论"},
+  "works": [{"awemeId": "demo-work-1", "title": "示例作品一"}, {"awemeId": "demo-work-2", "title": "示例作品二"}],
+  "comments": [
+    {"commentId": "demo-c1", "awemeId": "demo-work-1", "text": "这个工具怎么下载？", "createTime": 0, "diggCount": 8},
+    {"commentId": "demo-c2", "awemeId": "demo-work-1", "text": "有安装教程吗？", "createTime": 0, "diggCount": 5},
+    {"commentId": "demo-c3", "awemeId": "demo-work-1", "text": "我也想要一个链接", "createTime": 0, "diggCount": 3},
+    {"commentId": "demo-c4", "awemeId": "demo-work-2", "text": "Windows 可以用吗？", "createTime": 0, "diggCount": 4},
+    {"commentId": "demo-c5", "awemeId": "demo-work-2", "text": "讲得很清楚，谢谢", "createTime": 0, "diggCount": 1}
+  ]
+}

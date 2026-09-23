@@ -1,0 +1,17 @@
+{
+  "lane": "工具教程",
+  "summary": "虚构评论主要关注工具领取、安装教程和 Windows 兼容性。",
+  "viewpoints": [
+    {
+      "id": "demo-vp-install",
+      "title": "用户需要清晰的安装入口",
+      "summary": "多条虚构评论直接询问下载、安装和链接。",
+      "evidenceCommentIds": [
+        "demo-c1",
+        "demo-c2",
+        "demo-c3"
+      ],
+      "confidence": "高"
+    }
+  ]
+}
