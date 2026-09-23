@@ -9,6 +9,12 @@
 技能名称：`douyin-comment-insight-free`  
 安装包：`douyin-comment-insight-free-1.0.0.zip`
 
+## 教学与联系
+
+使用教程请查看：[教学使用文档](https://tyzwvof1d8.feishu.cn/wiki/BxaYwKTmUiIV0Ikud8LcVfx8nKh)。
+
+如果有任何问题，可以联系微信：`ai_coder_wang`。
+
 ## 推荐搭配使用
 
 推荐搭配之前分享的「运营助手」一起使用：先用本技能了解账号表现、整理评论讨论点和提取口播原文，再把分析结果交给运营助手，作为后续选题与内容运营的参考。
