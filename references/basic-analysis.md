@@ -11,4 +11,4 @@ findings.json 示例（证据 ID 必须替换为本次实际评论，不复制�
 }
 ```
 
-没有评论时 viewpoints 为空，简评解释仅有作品数据。输出账号简评和有原文证据的评论讨论点。brief.py 拒绝越界字段和不存在的证据，不覆盖原始作品/评论。
+viewpoints 最多 3 条，每条都需要真实原文证据。没有评论时 viewpoints 为空，简评解释仅有作品数据，不凑满讨论点。brief.py 校验证据后保存 analysis.json 和可直接阅读的 account-brief.md，不依赖本地转写环境。

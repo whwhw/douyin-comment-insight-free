@@ -24,7 +24,8 @@ def main():
         if layer in ('高价值提问','明确需求'): high.append(c)
     strategy_prompt='基于真实评论归纳主要讨论点，每条绑定证据ID；无评论则明确无证据。'
     work_payload=build_work_payload(d.get('works',[]),d.get('startedAt',''))
+    manifest=args.input.parent/'run-manifest.json'
+    work_payload['workWindow']['requested']=json.loads(manifest.read_text())['works'] if manifest.exists() else len(d.get('works',[]))
     out={'accountId':d.get('accountId'),'displayName':d.get('profile',{}).get('displayName',d.get('accountId')),'avatar':d.get('profile',{}).get('avatar',''),'followers':d.get('profile',{}).get('followers',0),'worksCount':len(d.get('works',[])),'updatedAt':d.get('startedAt',''),'bio':d.get('profile',{}).get('bio',''),'commentCount':len(comments),'profile':d.get('profile',{}),'source':d.get('source',{}),'commentLayers':[{'name':k,'count':v} for k,v in layers.items()],'keywords':[[k,v] for k,v in words.most_common(20)],'highValueComments':high[:50],'comments':comments,'codexPrompt':strategy_prompt,'warnings':d.get('warnings',[]),**work_payload}
     args.output.parent.mkdir(parents=True,exist_ok=True); args.output.write_text(json.dumps(out,ensure_ascii=False,indent=2)); print(json.dumps({'accountId':d.get('accountId'),'comments':len(comments),'keywords':len(out['keywords']),'output':str(args.output)},ensure_ascii=False))
 if __name__=='__main__': main()
-

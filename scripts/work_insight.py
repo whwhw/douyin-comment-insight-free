@@ -136,6 +136,5 @@ def build_work_payload(raw_works: list[dict[str, Any]], observed_at: str) -> dic
         "works": scored,
         "viralWorks": [row for row in scored if row["isAccountViral"]][:5],
         "latestWorks": latest[:5],
-        "selectedWorks": select_samples(scored),
+        "selectedWorks": select_samples(scored, limit=1),
     }
-

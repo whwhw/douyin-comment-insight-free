@@ -8,7 +8,7 @@ def run(*args):subprocess.run([sys.executable,*map(str,args)],cwd=ROOT,check=Tru
 def inspect(account):
     matches=sorted((WORKSPACE/'runs').glob(f'*/{account}/analysis-input.json'),reverse=True)
     return {'accountId':account,'edition':EDITION,'analysisInput':str(matches[0]) if matches else None}
-def prepare(account,resume=None,works=30,comments=100,offline=None):
+def prepare(account,resume=None,works=3,comments=30,offline=None):
     if not 1<=works<=30 or not 1<=comments<=100:raise ValueError('作品数须为1–30，单作品评论上限须为1–100')
     directory=Path(resume).resolve() if resume else WORKSPACE/'runs'/datetime.now(timezone.utc).strftime('%Y%m%d-%H%M%S-%f')/account
     directory.mkdir(parents=True,exist_ok=True);manifest=directory/'run-manifest.json'
@@ -34,7 +34,7 @@ def prepare(account,resume=None,works=30,comments=100,offline=None):
 if __name__=='__main__':
     ap=argparse.ArgumentParser();sp=ap.add_subparsers(dest='cmd',required=True)
     i=sp.add_parser('inspect');i.add_argument('--account',required=True)
-    p=sp.add_parser('prepare');p.add_argument('--account',required=True);p.add_argument('--resume',type=Path);p.add_argument('--works',type=int,default=30);p.add_argument('--comments',type=int,default=100);p.add_argument('--offline-input',type=Path)
+    p=sp.add_parser('prepare');p.add_argument('--account',required=True);p.add_argument('--resume',type=Path);p.add_argument('--works',type=int,default=3);p.add_argument('--comments',type=int,default=30);p.add_argument('--offline-input',type=Path)
     args=ap.parse_args()
     try:
         account=valid_account(args.account)
