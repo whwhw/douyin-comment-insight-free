@@ -10,6 +10,8 @@
 
 ## 教学与联系
 
+第一次使用请先阅读包内 [用户使用手册](USER_GUIDE.md)，其中提供可直接复制给 Codex 的安装和使用提示词。
+
 使用教程请查看：[教学使用文档](https://tyzwvof1d8.feishu.cn/wiki/BxaYwKTmUiIV0Ikud8LcVfx8nKh)。
 
 如果有任何问题，可以联系微信：`ai_coder_wang`。
