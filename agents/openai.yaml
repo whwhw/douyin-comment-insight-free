@@ -1,4 +1,4 @@
 interface:
   display_name: "抖音账号洞察 · 免费版"
-  short_description: "分析抖音账号作品表现与评论讨论点，在本地提取完整口播原文和字幕"
+  short_description: "分析作品与评论，提取口播、拆解结构和二创角度，生成完整可视化报告"
   default_prompt: "使用 $douyin-comment-insight-free 分析我提供的抖音账号并交付结果。"

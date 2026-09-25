@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>对标账号洞察</title>
+    <script>document.documentElement.classList.add('report-booting');window.__reportBootFallback=setTimeout(()=>document.documentElement.classList.remove('report-booting'),4000);</script>
+    
+  <link rel="stylesheet" href="assets/ui/report.css"></head>
+  <body>
+    <div class="reading-progress" id="readingProgress" aria-hidden="true"></div>
+    <main class="shell">
+      <div class="topline">
+        <div class="breadcrumb"><a class="back" href="comment-insight-index.html">‹ 返回洞察库</a><span>/</span><strong>账号详情</strong></div><span class="status">数据已连接</span>
+      </div>
+      <nav class="chapter-nav" aria-label="报告章节">
+        <div class="nav-brand" role="link" tabindex="0" aria-label="返回洞察库首页" onclick="location.href='comment-insight-index.html'" onkeydown="if(event.key==='Enter'){location.href='comment-insight-index.html'}"><b>AI</b><span>对标账号洞察<small>BENCHMARK INTELLIGENCE</small></span></div>
+        <a href="#overview" class="active"><i class="nav-icon" data-lucide="layout-dashboard" aria-hidden="true"></i><span class="nav-label">总览</span></a><a href="#breakdown"><i class="nav-icon" data-lucide="flame" aria-hidden="true"></i><span class="nav-label">爆款分析</span></a><a href="#signals"><i class="nav-icon" data-lucide="messages-square" aria-hidden="true"></i><span class="nav-label">评论洞察</span></a><a href="#evidence"><i class="nav-icon" data-lucide="quote" aria-hidden="true"></i><span class="nav-label">评论证据</span></a>
+        <div class="nav-foot">让好内容<br>被更多人看见<small>BETTER INSIGHTS<br>A BRIGHTER CREATOR FUTURE</small></div>
+      </nav>
+      <div id="overview" class="anchor"></div>
+      <section class="card identity">
+        <div class="profile" id="profile"></div>
+        <div class="facts" id="facts"></div>
+      </section>
+      <section class="diagnostic-grid" aria-label="核心判断与关键指标">
+      <section class="hero">
+        <article class="card">
+          <span class="eyebrow">一句话结论 / BENCHMARK ACCOUNT INSIGHT</span>
+          <h2 id="summary"></h2>
+          <p id="summaryDetail"></p>
+        </article>
+        <article class="card">
+          <span class="eyebrow">最值得先看 / PRIORITY</span>
+          <h2 id="priorityTitle"></h2>
+          <p id="priorityCopy"></p>
+        </article>
+      </section>
+      <section class="sample-kpis" id="metrics" aria-label="分析样本"></section>
+      </section>
+      <section class="dashboard" aria-label="账号数据仪表盘">
+        <article class="card dashboard-card">
+          <span class="eyebrow">PERFORMANCE DASHBOARD</span>
+          <h3>作品表现分布</h3>
+          <div id="performanceChart"></div>
+          <p class="dashboard-note" id="performanceNote"></p>
+        </article>
+        <article class="card dashboard-card">
+          <span class="eyebrow">AUDIENCE SIGNALS</span>
+          <h3>评论信号构成</h3>
+          <div class="donut-wrap">
+            <div class="donut" id="commentDonut" data-total="0"></div>
+            <div id="commentLegend"></div>
+          </div>
+        </article>
+      </section>
+      <section class="section chapter" id="breakdown">
+        <header class="section-head breakdown-head">
+          <div>
+            <div class="section-title-row"><span class="section-icon"><span class="asset-icon asset-flame"></span></span><h2>爆款分析</h2></div>
+          </div>
+          <div class="breakdown-dashboard"><div class="viz-strip" id="breakdownStats"></div></div>
+        </header>
+        <div class="grid2" id="workAnalyses"></div>
+      </section>
+      <section class="section chapter" id="signals">
+        <header class="section-head">
+          <div>
+            <div class="section-title-row"><span class="section-icon"><span class="asset-icon asset-comment"></span></span><h2>评论区分析</h2></div>
+            <p>评论需求证据用于解释互动信号，不把相关性写成因果</p>
+          </div>
+          <span class="index">03 / SIGNALS</span>
+        </header>
+        <div class="signals">
+          <article class="card">
+            <h3>评论类型</h3>
+            <div id="layers"></div>
+          </article>
+          <article class="card">
+            <h3>高赞与高价值评论</h3>
+            <div id="topComments"></div>
+          </article>
+          <article class="card">
+            <h3>用户需求画像</h3>
+            <div class="keywords" id="keywords"></div>
+            <p
+              id="audienceCopy"
+              style="color: var(--muted); font-size: 12px; line-height: 1.75"
+            ></p>
+          </article>
+        </div>
+      </section>
+      <section class="section chapter" id="evidence">
+        <header class="section-head">
+          <div>
+            <div class="section-title-row"><span class="section-icon"><span class="asset-icon asset-document"></span></span><h2>评论证据</h2></div>
+            <p>保留原始表达、作品归属和互动数据</p>
+          </div>
+          <span class="index">05 / EVIDENCE</span>
+        </header>
+        <article class="card raw">
+          <div class="filters">
+            <button class="filter active" data-filter="all">全部</button
+            ><button class="filter" data-filter="high">高价值</button>
+          </div>
+          <div class="comment-list" id="commentList"></div>
+        </article>
+      </section>
+    </main>
+    <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+      <div class="drawer-panel">
+        <button class="close" id="close" aria-label="关闭详情">×</button>
+        <h2 id="drawerTitle"></h2>
+        <div id="drawerBody"></div>
+      </div>
+    </aside>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+    <script>
+      /* INSIGHT_DATA_START */
+const pageData={};
+/* INSIGHT_DATA_END */
+const transcriptSections=pageData.transcriptSections||{};
+      const $=s=>document.querySelector(s),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),fmt=v=>new Intl.NumberFormat('zh-CN').format(Number(v)||0),date=v=>v?new Intl.DateTimeFormat('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(v)):'无日期';
+      const works=pageData.works||[],viral=pageData.viralWorks||[],analyses=pageData.workAnalyses||[],angles=pageData.recreationAngles||[],comments=pageData.comments||[],layers=pageData.commentLayers||[],views=pageData.viewpoints||[],qualified=new Set((pageData.qualifiedWorkIds||[]).map(String)),aMap=new Map(analyses.map(x=>[String(x.referenceId||x.reference_id),x])),wMap=new Map(works.map(x=>[String(x.awemeId),x])),name=pageData.displayName||pageData.accountId||'未知账号',windowData=pageData.workWindow||{};
+      const localCoverFallbacks=Object.fromEntries(works.filter(w=>w.cover).map(w=>[String(w.awemeId),w.cover]));
+      works.forEach(work=>{if(!work.cover&&localCoverFallbacks[String(work.awemeId)])work.cover=localCoverFallbacks[String(work.awemeId)]});
+      const angleText=value=>Array.isArray(value)?value.join('、'):String(value??'待补充'),angleLabels={new_scene_same_problem:'场景迁移',comparison_with_new_proof:'对照实测'};
+      document.title=`对标账号洞察 · ${name}`;$('#profile').innerHTML=`<div class="avatar">${pageData.avatar?`<img src="${esc(pageData.avatar)}" alt="" onerror="this.remove()">`:`<span>${esc(name[0])}</span>`}</div><div><span class="eyebrow">对标账号 / 公开数据</span><h1>${esc(name)}</h1><span class="handle">@${esc(pageData.accountId)}</span><p class="bio">${esc(pageData.bio)}</p></div>`;$('#facts').innerHTML=`<div class="fact"><small>内容赛道</small><strong>${esc(pageData.lane||'待归纳')}</strong></div><div class="fact"><small>粉丝数</small><strong>${fmt(pageData.followers)}</strong></div><div class="fact"><small>观察窗口</small><strong>${fmt(works.length)} 条作品</strong></div><div class="fact"><small>最后采集</small><strong>${date(windowData.observedAt||pageData.updatedAt)}</strong></div>`;
+      $('#summary').textContent=pageData.summary||'尚未完成账号内容洞察';$('#summaryDetail').textContent=views[0]?.summary||'把作品表现、真实口播与评论需求放在同一条证据链中观察。';const pa=analyses.find(x=>qualified.has(String(x.referenceId||x.reference_id)));$('#priorityTitle').textContent=pa?.summary||'先补齐作品证据';$('#priorityCopy').textContent=pa?.targetAudienceProblem||'只有通过完整转写校验的作品才进入内容级分析。';const transcriptTarget=Math.max((pageData.selectedWorks||[]).length,qualified.size),sampleKpis=[{label:'已采集作品',value:fmt(works.length),unit:'条',art:'asset-docs',tone:'works'},{label:'爆款数量',value:fmt(viral.length),unit:'条',art:'asset-chart',tone:'viral'},{label:'合格转写',value:`${fmt(qualified.size)} / ${fmt(transcriptTarget)}`,unit:'',art:'asset-wave',tone:'ratio'},{label:'评论证据',value:fmt(comments.length),unit:'条',art:'asset-cards',tone:'comments'}];$('#metrics').innerHTML=sampleKpis.map(x=>`<article class="sample-kpi sample-kpi--${x.tone}" aria-label="${x.label} ${x.value}${x.unit}"><span class="sample-kpi__label">${x.label}</span><strong class="sample-kpi__value">${x.value}${x.unit?`<span class="sample-kpi__unit">${x.unit}</span>`:''}</strong><span class="asset-icon ${x.art} sample-kpi__art" aria-hidden="true"></span></article>`).join('');
+      const da=works.map(w=>({w,a:aMap.get(String(w.awemeId))})).filter(x=>x.a&&qualified.has(String(x.w.awemeId)));$('#workAnalyses').innerHTML=da.length?da.map(({w,a})=>`<article class="card analysis" data-work="${esc(w.awemeId)}"><div class="analysis-cover">${w.cover?`<img src="${esc(w.cover)}" alt="${esc(w.title||'作品封面')}" onerror="this.remove()">`:''}<span class="analysis-rank">#${fmt(w.viralRank||'-')}</span></div><div class="analysis-body"><span class="score-pill">爆款指数 ${Number(w.viralScore||0).toFixed(2)}</span><h3>${esc(w.title||a.sourceTopic)}</h3><p>${esc(a.summary||a.targetAudienceProblem)}</p><div class="evidence">${fmt((a.goldenQuotes||[]).length)} 条金句 · 完整口播已验证 · 点击展开分析</div></div></article>`).join(''):'<div class="card empty">尚无合格完整转写；内容级结论已隐藏。</div>';
+      const quoteCount=analyses.reduce((n,a)=>n+(a.goldenQuotes||[]).length,0);$('#breakdownStats').innerHTML=[['合格拆解',`${qualified.size} / ${(pageData.selectedWorks||[]).length||0}`,'file-text'],['口播金句',quoteCount,'lightbulb'],['内容段落',analyses.reduce((n,a)=>n+(a.structureBeats||[]).length,0),'list']].map(x=>`<div class="viz-stat"><i data-lucide="${x[2]}" class="breakdown-kpi-icon" aria-hidden="true"></i><div class="kpi-copy"><small>${x[0]}</small><strong><span>${x[1]}</span></strong></div></div>`).join('');
+      const ml=Math.max(...layers.map(x=>+x.count||0),1);$('#layers').innerHTML=layers.length?layers.map(x=>`<div class="layer"><span>${esc(x.name)}</span><span class="bar"><i style="width:${(+x.count||0)/ml*100}%"></i></span><b>${fmt(x.count)}</b></div>`).join(''):'暂无评论分层';const high=comments.filter(x=>['高价值提问','明确需求','负面风险'].includes(x.layer)).sort((a,b)=>(+b.diggCount||0)-(+a.diggCount||0));$('#topComments').innerHTML=(high.length?high:comments).slice(0,5).map(x=>`<div class="top-comment"><p>${esc(x.text)}</p><small>${esc(x.layer||'常规互动')} · 赞 ${fmt(x.diggCount)} · 作品 ${esc(x.awemeId)}</small></div>`).join('')||'<div class="empty">暂无评论证据</div>';const kws=pageData.keywords||pageData.demandKeywords||layers.map(x=>x.name);$('#keywords').innerHTML=kws.slice(0,14).map(x=>`<span class="keyword">${esc(typeof x==='string'?x:Array.isArray(x)?x[0]:x.keyword||x.name)}</span>`).join('');$('#audienceCopy').textContent=views[1]?.summary||'从明确需求、高价值提问和风险反馈中识别观众问题。';
+      const notes=[...(pageData.limitations||[]),...(pageData.warnings||[])];
+      if(notes.length){const note=document.createElement('section');note.className='card';note.innerHTML='<h3>数据范围与质量说明</h3>'+notes.map(x=>`<p>${esc(x)}</p>`).join('');$('#commentList').parentElement.before(note);}
+      const commentMap=new Map(comments.map(x=>[String(x.commentId||x.comment_id),x]));
+      const signalGrid=$('#signals .signals'),signalTotal=Math.max(layers.reduce((n,x)=>n+(+x.count||0),0),comments.length),signalColors=['#69e0d0','#a784f4','#e8be77','#ff737d'];let signalOffset=0;
+      const signalSegments=layers.map((x,i)=>{const pct=(+x.count||0)/(signalTotal||1)*100,node=`<circle cx="50" cy="50" r="40" pathLength="100" fill="none" stroke="${signalColors[i%signalColors.length]}" stroke-width="18" stroke-dasharray="${pct} ${100-pct}" stroke-dashoffset="${-signalOffset}"></circle>`;signalOffset+=pct;return node}).join('');
+      const liked=[...comments].sort((a,b)=>(+b.diggCount||0)-(+a.diggCount||0)).slice(0,4),maxLiked=Math.max(...liked.map(x=>+x.diggCount||0),1);
+      const keywordRows=(pageData.keywords||pageData.demandKeywords||[]).map(x=>Array.isArray(x)?{name:x[0],count:+x[1]||0}:{name:x.displayLabel||x.keyword||x.name||x.text,count:+x.count||0}).filter(x=>x.name).sort((a,b)=>b.count-a.count).slice(0,4),primaryKeyword=keywordRows[0];
+      signalGrid.innerHTML=`<article class="card signal-panel"><div class="signal-panel-head"><h3>评论类型分层（规则初筛）</h3><span>${fmt(signalTotal)} 条评论</span></div><div class="signal-donut-wrap"><div class="signal-donut"><svg viewBox="0 0 100 100">${signalSegments}</svg><b class="signal-donut-center">${fmt(signalTotal)}</b></div><div class="signal-legend">${layers.map((x,i)=>`<div class="signal-legend-row" style="--tone:${signalColors[i%signalColors.length]}"><i></i><span>${esc(x.name)}</span><b>${fmt(x.count)}</b></div>`).join('')}</div></div></article><article class="card signal-panel"><div class="signal-panel-head"><h3>高赞评论排行</h3><span>按点赞数降序</span></div><div class="like-chart">${liked.map((x,i)=>`<div><div class="like-label"><b>${String(i+1).padStart(2,'0')}</b><span title="${esc(x.text)}">${esc(x.text)}</span><strong>${fmt(x.diggCount)}</strong></div><div class="like-track"><i style="width:${Math.max((+x.diggCount||0)/maxLiked*100,4)}%"></i></div></div>`).join('')||'<div class="empty">暂无点赞数据</div>'}</div></article><article class="card signal-panel"><div class="signal-panel-head"><h3>用户需求画像</h3><span>评论关键词信号</span></div>${primaryKeyword?`<div class="profile-primary"><strong>${fmt(primaryKeyword.count)} 条</strong><h4>${esc(primaryKeyword.name)}</h4><p>评论中的高频词，需结合上下文解释</p></div>`:'<div class="empty">暂无需求信号</div>'}<div>${keywordRows.slice(1).map((x,i)=>`<div class="profile-secondary" style="--tone:${signalColors[(i+1)%signalColors.length]}"><i></i><span>${esc(x.name)}</span><b>${fmt(x.count)} 条</b></div>`).join('')}</div><p class="profile-note">关键词可能重叠，仅表示评论中的内容信号。</p></article>`;
+      const commentById=new Map(comments.map(x=>[String(x.commentId),x]));
+      function openComment(x){if(!x)return;$('.drawer-panel').classList.remove('work-detail');$('#drawer').classList.remove('work-open');$('#drawerTitle').textContent=x.text||'评论证据';$('#drawerBody').innerHTML=`<div class="drawer-block"><small>规则初筛</small><p>${esc(x.layer||'待判断')}</p></div><div class="drawer-block"><small>用户意图</small><p>${esc(x.intent||'需要结合更多同类评论继续判断')}</p></div><div class="drawer-block"><small>关联作品</small><p>${esc(x.awemeId||'未关联')}</p></div>`;$('#drawer').classList.add('open')}
+      function render(f='all'){const list=(f==='high'?high:comments).map(x=>({...x,isHigh:['高价值提问','明确需求','负面风险'].includes(x.layer)}));$('#commentList').innerHTML=list.map(x=>`<article class="comment" data-comment="${esc(x.commentId)}" role="button" tabindex="0"><i class="comment-dot ${x.isHigh?'high':''}" aria-hidden="true"></i><div><div class="comment-text">${esc(x.text)}</div><div class="comment-sub">${esc(x.layer||'常规互动')} · ${esc(x.intent||`作品 ${x.awemeId||'未关联'}`)}</div></div><span class="comment-score">♥ ${fmt(x.diggCount)}</span></article>`).join('')||'<div class="empty">暂无评论证据</div>';document.querySelectorAll('[data-comment]').forEach(el=>{const open=()=>openComment(commentById.get(String(el.dataset.comment)));el.onclick=open;el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open()}}})}render();document.querySelectorAll('.filter').forEach(b=>b.onclick=()=>{document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');render(b.dataset.filter)});
+      function openWork(id){
+        const w=wMap.get(String(id)),a=aMap.get(String(id)),wc=comments.filter(x=>String(x.awemeId)===String(id)),workAngles=angles.filter(x=>(x.referenceIds||[]).map(String).includes(String(id)));if(!w)return;
+        $('.drawer-panel').classList.add('work-detail');
+        $('#drawer').classList.add('work-open');
+        const cleanTitle=String(w.title||'作品拆解').split('#')[0].split(/[！!。\n]/)[0].trim();
+        const titleChars=Array.from(cleanTitle);
+        $('#drawerTitle').textContent=titleChars.length>48?`${titleChars.slice(0,47).join('')}…`:cleanTitle;
+        const cover=w.cover||`assets/${w.awemeId}-cover.jpg`;
+        const hasAnalysis=a&&qualified.has(String(id));
+        const facts=hasAnalysis?[['目标问题',a.targetAudienceProblem],['核心冲突',a.coreTension],['留存机制',a.retentionDevice],['行动引导',a.cta]].filter(x=>x[1]):[];
+        const coreMarkup=hasAnalysis?`<section class="drawer-core"><small>核心判断</small><p class="drawer-summary">${esc(a.summary||a.sourceTopic)}</p><div class="analysis-facts">${facts.map(([label,value])=>`<div class="analysis-fact"><span>${label}</span><p>${esc(value)}</p></div>`).join('')}</div></section>`:'';
+        let body=`<div class="drawer-kicker">作品深度拆解</div><div class="drawer-hero"><div class="drawer-cover"><img src="${esc(cover)}" alt="${esc(cleanTitle)}作品封面" onerror="this.remove()"></div>${coreMarkup}</div>`;
+        if(!hasAnalysis){
+          body+='<section class="drawer-block"><small>内容证据</small><p class="drawer-summary">该作品尚无合格完整转写，暂不展示口播结构、金句或内容结论。</p></section>';
+        }else{
+          const quoteTime=ms=>`${String(Math.floor(ms/60000)).padStart(2,'0')}:${String(Math.floor(ms/1000)%60).padStart(2,'0')}`;
+          const quotes=(a.goldenQuotes||[]).map(x=>`<article class="quote"><small>${esc(x.type||'原文摘录')}${x.startMs!=null?` · ${quoteTime(x.startMs)}–${quoteTime(x.endMs??x.startMs)}`:''} · ASR 原文（仅补标点）</small><p>“${esc(x.text||x)}”</p>${x.whyItWorks?`<p><b>表达作用：</b>${esc(x.whyItWorks)}</p>`:''}${x.reusablePattern?`<p><b>可借鉴句式（提炼，非原话）：</b>${esc(x.reusablePattern)}</p>`:''}</article>`).join('');
+          const timedSections=transcriptSections[String(id)]||[];
+          const structureReview=(section,index,total)=>{
+            const supplied=section.review||section.critique||{},label=String(section.structure||''),duration=Math.max(0,Number(section.endMs||0)-Number(section.startMs||0));
+            if(typeof supplied==='string'&&supplied.trim())return {strength:supplied.trim(),risk:'需结合上下段判断信息密度与衔接。',improvement:'保留有效信息，进一步压缩重复表达。'};
+            if(supplied.strength||supplied.risk||supplied.improvement)return {strength:supplied.strength||'承担了明确的段落功能。',risk:supplied.risk||'仍需结合上下文检查衔接。',improvement:supplied.improvement||'强化这一段与下一段的承接。'};
+            let strength='承担信息推进作用，使内容按主题逐步展开。',risk='段落功能较宽泛，观众可能不易抓住唯一重点。',improvement='用一句阶段结论收束，再明确引出下一段。';
+            if(index===0||/开场|预告|承诺|钩子|反差/.test(label)){strength='快速交代观看收益或建立悬念，便于观众判断是否继续看。';risk='如果铺垫过长或承诺太泛，前段留存容易下降。';improvement='更早给出具体结果、对象和差异点，随后再补背景。';}
+            else if(/案例|演示|实测|数据|证据|对比/.test(label)){strength='用案例或证据承接观点，降低纯口述带来的抽象感。';risk='只展示成功结果时，容易缺少条件、成本和失败边界。';improvement='补充前提、对照结果与失败样本，让证据更完整。';}
+            else if(/步骤|流程|方法|安装|操作|模式/.test(label)){strength='把复杂任务拆成可跟随步骤，提升内容的可执行性。';risk='步骤连续堆叠时信息密度较高，容易记不住关键节点。';improvement='突出每一步的输入、动作和验收结果，并增加阶段小结。';}
+            else if(/问题|风险|限制|冲突|避坑|门槛/.test(label)){strength='主动说明限制或风险，能提高判断价值和内容可信度。';risk='如果只有风险没有解决路径，可能放大焦虑却无法促进行动。';improvement='在风险后紧接适用条件、替代方案或检查清单。';}
+            else if(/概念|解释|背景|原理|定义/.test(label)){strength='先统一概念与背景，有助于降低后续内容的理解门槛。';risk='解释过多会推迟核心结论，削弱前半段推进速度。';improvement='保留与结论直接相关的定义，其余背景改为例子带出。';}
+            else if(index===total-1||/总结|回顾|收尾|行动|引导/.test(label)){strength='负责回收前文并给出结束信号，结构完整。';risk='若只是重复前文，结尾的信息增量和行动动力会偏弱。';improvement='压缩复述，明确下一步动作、适用人群或验证标准。';}
+            if(duration>90000){risk+=` 本段约 ${Math.round(duration/1000)} 秒，承载内容偏多。`;improvement+=' 可拆成两个小节或加入一次视觉换挡。';}
+            return {strength,risk,improvement};
+          };
+          const transcriptRows=timedSections.map((section,index)=>{const review=structureReview(section,index,timedSections.length);return `<article class="transcript-row"><time class="transcript-time">${esc(section.time||(section.startMs!=null?`${quoteTime(section.startMs)}–${quoteTime(section.endMs??section.startMs)}`:'时间待补充'))}</time><div class="transcript-structure"><div>${esc(section.structure)}</div><div class="transcript-review"><p><b>优点</b>${esc(review.strength)}</p><p><b>风险</b>${esc(review.risk)}</p><p><b>提升</b>${esc(review.improvement)}</p></div></div><div class="transcript-segment"><p>${esc(section.readingText||section.text)}</p></div></article>`}).join('');
+          body+=`<section class="drawer-block drawer-transcript-block"><small>口播结构、原文与点评</small>${transcriptRows?`<div class="transcript-table"><header class="transcript-table-head"><span>时间</span><span>结构与点评</span><span>对应口播稿（标点整理）</span></header>${transcriptRows}</div>`:`<div class="transcript"><p>${esc(a.spokenScript||'口播文件已验证，但当前报告未嵌入全文。')}</p></div>`}</section>`;
+          if(quotes)body+=`<section class="drawer-block"><small>口播金句</small><div class="quote-list">${quotes}</div></section>`;
+        }
+        const angleItems=workAngles.map((x,i)=>`<article class="drawer-angle"><span class="drawer-angle-type">角度 ${String(i+1).padStart(2,'0')} · ${esc(angleLabels[x.derivationType]||'二创方向')}</span><div><h3>${esc(x.titleDirection||x.title||x.angle||'待验证方向')}</h3><p>${esc(x.summary||angleText(x.changedElements))}</p><dl class="angle-action-details">${[['开场怎么说',x.hook],['内容怎么拍',x.shootingPlan],['补充什么证据',x.evidencePlan||x.newProofPlan],['如何验证',x.successCriteria||x.proofRequirement]].filter(([,v])=>v).map(([label,value])=>`<div><dt>${label}</dt><dd>${esc(angleText(value))}</dd></div>`).join('')}</dl></div></article>`).join('');
+        body+=`<section class="drawer-block"><small>可二创角度</small>${angleItems?`<div class="drawer-angle-list">${angleItems}</div>`:'<p class="drawer-angle-empty">当前作品暂无已关联、可验证的二创角度。</p>'}</section>`;
+        body+=`<section class="drawer-block"><small>评论信号</small><div class="comment-signal"><p>${wc.length?'关联评论用于辅助理解互动，不推断内容与表现之间的因果。':'当前没有关联评论样本。'}</p><b>${fmt(wc.length)} 条</b></div></section>`;
+        $('#drawerBody').innerHTML=body;
+        const sections=[...$('#drawerBody').querySelectorAll('.drawer-core,.drawer-block')];
+        const toc=document.createElement('nav');toc.className='drawer-toc';toc.setAttribute('aria-label','作品详情章节');
+        sections.forEach((section,index)=>{
+          const button=document.createElement('button');button.type='button';button.textContent=section.querySelector('small')?.textContent||'详情';
+          section.id=`work-section-${index}`;button.setAttribute('aria-controls',section.id);
+          button.onclick=()=>{const panel=$('.drawer-panel');panel.scrollTo({top:panel.scrollTop+section.getBoundingClientRect().top-panel.getBoundingClientRect().top-84,behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'instant':'smooth'});};
+          toc.append(button);
+        });
+        $('#drawerBody').prepend(toc);
+        $('.drawer-panel').onscroll=()=>{
+          const panelTop=$('.drawer-panel').getBoundingClientRect().top;let current=0;
+          sections.forEach((section,index)=>{if(section.getBoundingClientRect().top-panelTop<=100)current=index;});
+          [...toc.children].forEach((button,index)=>button.setAttribute('aria-current',String(index===current)));
+        };
+        $('.drawer-panel').onscroll();$('#drawer').classList.add('open')
+      }
+      let drawerReturnFocus=null,drawerScrollStyle='',drawerWasOpen=false;
+      const drawerElement=$('#drawer'),drawerPanel=$('.drawer-panel');
+      function closeDrawer(){drawerElement.classList.remove('open')}
+      document.addEventListener('click',e=>{if(e.target.closest('.source-video-icon'))return;const x=e.target.closest('[data-work]');if(x){drawerReturnFocus=x.closest('.analysis')?.querySelector('.analysis-open')||x;openWork(x.dataset.work)}});
+      $('#close').onclick=closeDrawer;
+      drawerElement.onclick=e=>{if(e.target===drawerElement)closeDrawer()};
+      new MutationObserver(()=>{
+        const isOpen=drawerElement.classList.contains('open');if(isOpen===drawerWasOpen)return;drawerWasOpen=isOpen;
+        if(isOpen){
+          if(!drawerReturnFocus)drawerReturnFocus=document.activeElement;
+          drawerScrollStyle=document.documentElement.style.overflow;document.documentElement.style.overflow='hidden';
+          drawerPanel.scrollTop=0;$('#close').focus({preventScroll:true});
+        }else{
+          document.documentElement.style.overflow=drawerScrollStyle;
+          drawerPanel.onscroll=null;
+          if(drawerReturnFocus?.isConnected)drawerReturnFocus.focus({preventScroll:true});drawerReturnFocus=null;
+        }
+      }).observe(drawerElement,{attributes:true,attributeFilter:['class']});
+      document.addEventListener('keydown',e=>{
+        if(!drawerElement.classList.contains('open'))return;
+        if(e.key==='Escape'){e.preventDefault();closeDrawer()}
+        if(e.key==='Tab'){
+          const items=[...drawerPanel.querySelectorAll('button,a[href],input,select,textarea,[tabindex="0"]')].filter(el=>!el.disabled&&el.getClientRects().length);
+          const first=items[0],last=items[items.length-1];
+          if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus()}
+          else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus()}
+        }
+      });
+      function initMotion(){if(!window.gsap)return;const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;if(reduce){gsap.set('.reading-progress',{scaleX:1});return}gsap.defaults({duration:.72,ease:'power3.out'});const intro=gsap.timeline({defaults:{ease:'power3.out',clearProps:'transform,opacity,visibility'}});
+        intro.from('.identity',{autoAlpha:0,y:10,duration:.65},0)
+          .from('.topline,.chapter-nav',{autoAlpha:0,duration:.6},0)
+          .from('.hero .card',{autoAlpha:0,y:12,duration:.8,stagger:.1},.25)
+          .from('.sample-kpi',{autoAlpha:0,y:10,duration:.8,stagger:.12},.45);
+        function revealCharts(root){
+          const bars=root.querySelectorAll('.chart-fill,.like-track > i');
+          if(bars.length)gsap.from(bars,{scaleX:0,transformOrigin:'left center',duration:1.2,stagger:.05,clearProps:'transform'});
+          root.querySelectorAll('.donut,.signal-donut svg').forEach(ring=>{
+            const sweep={angle:0};
+            gsap.to(sweep,{angle:360,duration:1.3,ease:'power2.out',onUpdate:()=>ring.style.maskImage=`conic-gradient(#000 ${sweep.angle}deg,transparent 0deg)`,onComplete:()=>ring.style.removeProperty('mask-image')});
+          });
+        }
+        const chartObserver=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){revealCharts(entry.target);chartObserver.unobserve(entry.target)}}),{threshold:.15});
+        document.querySelectorAll('.dashboard-card,.signal-panel').forEach(card=>chartObserver.observe(card));
+        const seen=new WeakSet(),observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(!entry.isIntersecting||seen.has(entry.target))return;seen.add(entry.target);const revealTargets=[...entry.target.querySelectorAll('.section-head, .card, .business-card, .rank-row')].filter(el=>!el.matches('.identity,.hero .card,.dashboard-card')&&!el.parentElement.closest('.card,.business-card'));if(revealTargets.length)gsap.from(revealTargets,{autoAlpha:0,y:20,stagger:.05,duration:.58,ease:'power3.out',clearProps:'transform,opacity,visibility'});observer.unobserve(entry.target)}),{threshold:.08,rootMargin:'0px 0px -8%'});document.querySelectorAll('.section').forEach(el=>observer.observe(el));const progressTo=gsap.quickTo('#readingProgress','scaleX',{duration:.18,ease:'power1.out'});addEventListener('scroll',()=>{const max=document.documentElement.scrollHeight-innerHeight;progressTo(max>0?scrollY/max:0)},{passive:true})}requestAnimationFrame(initMotion);
+      const navLinks=[...document.querySelectorAll('.chapter-nav a')],navTargets=navLinks.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);new IntersectionObserver(entries=>entries.forEach(entry=>{if(!entry.isIntersecting)return;navLinks.forEach(a=>a.classList.toggle('active',a.getAttribute('href')===`#${entry.target.id}`))}),{rootMargin:'-18% 0px -68%',threshold:0}).observe(document.querySelector('#overview'));navTargets.slice(1).forEach(el=>new IntersectionObserver(entries=>entries.forEach(entry=>{if(!entry.isIntersecting)return;navLinks.forEach(a=>a.classList.toggle('active',a.getAttribute('href')===`#${entry.target.id}`))}),{rootMargin:'-18% 0px -68%',threshold:0}).observe(el));
+      // Overview presents the existing report evidence in the supplied dashboard composition.
+      const avatarEl=$('#profile .avatar');if(!avatarEl.querySelector('img'))avatarEl.innerHTML=`<img src="assets/${esc(pageData.accountId)}-avatar.jpg" alt="${esc(name)}头像" onerror="this.remove()">`;
+      const factItems=[...document.querySelectorAll('#facts .fact')],followersFact=factItems[1],worksFact=factItems[2];
+      if(followersFact){const value=followersFact.querySelector('strong').textContent;followersFact.querySelector('strong').innerHTML=`<span>${esc(value)}</span><i class="fact-user-icon" data-lucide="users" aria-hidden="true"></i>`}
+      if(worksFact){worksFact.querySelector('small').textContent='观察作品';const value=worksFact.querySelector('strong').textContent;worksFact.querySelector('strong').innerHTML=`<span>${esc(value)}</span><i class="fact-work-icon" data-lucide="square-play" aria-hidden="true"></i>`}
+      // Animate the two account totals together, once per page load.
+      const accountCounters=[followersFact,worksFact].filter(Boolean).map(fact=>{
+        const node=fact.querySelector('strong > span'),finalText=node.textContent;
+        const match=finalText.match(/^([\d,]+)(.*)$/);
+        return match?{node,finalText,target:Number(match[1].replaceAll(',','')),suffix:match[2]}:null;
+      }).filter(Boolean);
+      if(!matchMedia('(prefers-reduced-motion:reduce)').matches){
+        accountCounters.forEach(({node,finalText,suffix})=>{node.parentElement.setAttribute('aria-label',finalText);node.setAttribute('aria-hidden','true');node.style.fontVariantNumeric='tabular-nums';node.textContent=`0${suffix}`;});
+        let counterStarted;
+        function tickAccountCounters(now){
+          counterStarted??=now;
+          const progress=Math.min((now-counterStarted)/1000,1),eased=1-Math.pow(1-progress,3);
+          accountCounters.forEach(({node,finalText,target,suffix})=>{node.textContent=progress===1?finalText:`${fmt(Math.floor(target*eased))}${suffix}`;});
+          if(progress<1)requestAnimationFrame(tickAccountCounters);
+        }
+        requestAnimationFrame(tickAccountCounters);
+      }
+      const profileText=$('#profile h1').parentElement,heading=document.createElement('div');heading.className='profile-heading';profileText.insertBefore(heading,$('#profile h1'));heading.append($('#profile h1'),$('#profile .handle'));
+      const topicTags=String(pageData.lane||'').split(/[,，、与]/).map(x=>x.trim()).filter(Boolean).slice(0,3);heading.insertAdjacentHTML('afterend',`<div class="profile-tags">${topicTags.map(x=>`<span>${esc(x)}</span>`).join('')}</div>`);
+      const core=$('.hero article:first-child');core.querySelector('.eyebrow').innerHTML='<i class="core-label-icon" data-lucide="scan-search" aria-hidden="true"></i><span>核心判断</span>';
+      const fullSummary=$('#summary').textContent;const shortText=(text,max)=>{const chars=Array.from(String(text||''));return chars.length>max?chars.slice(0,max-1).join('')+'…':chars.join('')};$('#summary').textContent=shortText(pageData.overviewHeadline||fullSummary.split(/[；。]/)[0],36);$('#summary').title=fullSummary;
+      $('#summaryDetail').textContent=shortText(pageData.overviewDescription||$('#summaryDetail').textContent,52);
+      const insightHeadline=String(pageData.overviewHeadline||fullSummary).replace(/^高互动聚焦[：:\s]*/,''),accentPhrase='跑通 AI 工具',accentAt=insightHeadline.indexOf(accentPhrase);$('#summary').innerHTML=accentAt>=0?`${esc(insightHeadline.slice(0,accentAt))}<em>${esc(insightHeadline.slice(accentAt))}</em>`:esc(shortText(insightHeadline,30));$('#summary').insertAdjacentHTML('beforebegin','<span class="insight-kicker">高互动聚焦</span>');const insightTop=document.createElement('div');insightTop.className='insight-top';core.insertBefore(insightTop,core.firstChild);insightTop.append(core.querySelector('.eyebrow'),core.querySelector('.insight-kicker'));core.insertAdjacentHTML('beforeend','<span class="asset-icon asset-radar hero-art core-radar" aria-hidden="true"></span><div class="insight-path" aria-label="评论洞察的三个通用层次"><div class="insight-step"><span class="asset-icon asset-comment step-art" aria-hidden="true"></span><span><strong>讨论焦点</strong><small>评论最关注什么</small></span></div><i class="insight-arrow" data-lucide="chevron-right" aria-hidden="true"></i><div class="insight-step"><span class="asset-icon asset-idea step-art" aria-hidden="true"></span><span><strong>真实需求</strong><small>用户想解决什么</small></span></div><i class="insight-arrow" data-lucide="chevron-right" aria-hidden="true"></i><div class="insight-step"><svg class="action-direction-icon" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#79bac4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 2v4M15 2v4M9 11h6M9 15h4"/></svg><span><strong>行动方向</strong><small>下一步如何验证</small></span></div></div>');
+      const performanceCard=$('.dashboard-card');performanceCard.querySelector('.eyebrow').insertAdjacentHTML('afterend','<div class="panel-heading"><span class="panel-number">01</span></div>');performanceCard.querySelector('h3').textContent='高互动作品';performanceCard.querySelector('.panel-heading').append(performanceCard.querySelector('h3'));
+      const interactionTotal=w=>{const values=['diggCount','commentCount','collectCount','shareCount'].map(k=>w[k]);return values.every(v=>v!==null&&v!==undefined&&v!==''&&Number.isFinite(Number(v))&&Number(v)>=0)?values.reduce((n,v)=>n+Number(v),0):null};
+      const rankedInteractions=works.map(w=>({w,total:interactionTotal(w)})).sort((a,b)=>(b.total??-1)-(a.total??-1)).slice(0,4),maxInteraction=Math.max(0,...rankedInteractions.map(x=>x.total??0));
+      $('#performanceChart').innerHTML=rankedInteractions.map(({w,total},i)=>{const clean=String(w.title||'无标题').replace(/\s+/g,' ').trim(),title=shortText(clean.replace(/#[^#\s]+/g,'').trim(),76);return `<div class="chart-row" data-work="${esc(w.awemeId)}" role="button" tabindex="0" aria-label="查看作品：${esc(w.title)}"><span class="work-rank">${String(i+1).padStart(2,'0')}</span><div class="work-cover" role="img" aria-label="${esc(title)}作品封面"><span class="asset-icon asset-play" aria-hidden="true"></span>${w.cover?`<img src="${esc(w.cover)}" alt="" loading="lazy" onerror="this.remove()">`:''}</div><div class="work-copy"><div class="work-title" title="${esc(clean)}">${esc(title)}</div><div class="work-meta"><span>${date(w.publishedAt)}</span><i></i><span>抖音作品</span></div></div><div class="work-score"><strong>${total===null?'—':fmt(total)}</strong><small>总互动</small><span class="chart-track"><i class="chart-fill" style="width:${maxInteraction&&total!==null?total/maxInteraction*100:0}%"></i></span></div></div>`}).join('')||'<p>暂无作品数据</p>';
+      $('#performanceNote').remove();
+      $('#performanceChart').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.dataset.work){e.preventDefault();openWork(e.target.dataset.work)}});
+      const dashboardGrid=performanceCard.parentElement,signalCard=dashboardGrid.querySelectorAll('.dashboard-card')[1],signalGridEl=$('#signals .signals'),layerCard=signalGridEl.querySelector('.signal-panel'),profileCard=signalGridEl.lastElementChild;if(signalCard)signalCard.remove();performanceCard.classList.add('relocated-performance');layerCard.classList.add('layer-summary-card');profileCard.classList.add('profile-signal-card');signalGridEl.classList.add('signals-reduced');const leadView=views[0],leadFallback=high[0],leadTitle=leadView?.title||leadFallback?.intent||'观众核心关注',leadSummary=leadView?.summary||leadFallback?.text||'评论信号仍待积累',leadCount=(leadView?.evidenceCommentIds||(leadFallback?[leadFallback.commentId]:[])).length,focusLayers=layers.filter(x=>x.name!=='常规互动').slice(0,3);layerCard.insertAdjacentHTML('beforeend',`<div class="comment-layer-summary"><span class="asset-icon asset-comment" aria-hidden="true"></span><div><h4>${esc(leadTitle)}</h4><p>${esc(leadSummary)}</p><small>${fmt(leadCount)} 条评论证据</small></div></div><div class="layer-kpis">${focusLayers.map((x,i)=>`<div class="layer-kpi" style="--tone:${signalColors[(i+1)%signalColors.length]}"><strong>${fmt(x.count)}</strong><span>${esc(x.name)}</span><small>${signalTotal?((+x.count||0)/(signalTotal||1)*100).toFixed(1):0}%</small></div>`).join('')}</div>`);const fusion=document.createElement('section');fusion.className='overview-fusion';$('#signals .section-head').after(fusion);fusion.append(performanceCard,layerCard);dashboardGrid.remove();
+      function syncChapter(){let current=navTargets[0];navTargets.forEach(el=>{if(el.getBoundingClientRect().top<=140)current=el});navLinks.forEach(a=>{const active=a.hash===`#${current.id}`;a.classList.toggle('active',active);if(active)a.setAttribute('aria-current','location');else a.removeAttribute('aria-current')})}addEventListener('scroll',syncChapter,{passive:true});syncChapter();
+      $('.status').textContent=`已采集 · ${date(windowData.observedAt||pageData.updatedAt)}`;
+      document.querySelectorAll('.asset-icon').forEach(el=>el.setAttribute('aria-hidden','true'));
+      $('#summaryDetail').classList.add('overview-excerpt');
+      document.querySelectorAll('.signal-evidence p').forEach(p=>{const textNode=p.firstChild;if(textNode&&textNode.nodeType===3){const excerpt=document.createElement('span');excerpt.className='overview-excerpt';excerpt.textContent=textNode.textContent;p.replaceChild(excerpt,textNode)}});
+      $('#performanceChart').innerHTML=rankedInteractions.map(({w,total},i)=>{const displayTitle=shortText(String(w.title||'无标题').replace(/#[^#\s]+/g,'').replace(/\s+/g,' ').trim(),76);return `<button type="button" class="cover-row" data-work="${esc(w.awemeId)}"><span class="work-list-rank">${String(i+1).padStart(2,'0')}</span><span class="work-thumb">${w.cover?`<img src="${esc(w.cover)}" alt="${esc(displayTitle)}" loading="lazy" onerror="this.remove()">`:'<span class="asset-icon asset-video" aria-hidden="true"></span>'}</span><span class="work-text"><strong title="${esc(w.title||'无标题')}">${esc(displayTitle)}</strong><small>${date(w.publishedAt)} · 抖音作品</small></span><span class="work-total" aria-label="互动量 ${total===null?'待补齐':fmt(total)}"><b>${total===null?'—':fmt(total)}</b><small>总互动</small></span></button>`}).join('');
+      signalCard.querySelectorAll('.signal-bar,.signal-legend,.signal-evidence').forEach(el=>el.remove());
+      [...signalCard.children].filter(el=>el.tagName==='P').forEach(el=>el.remove());
+      signalCard.insertAdjacentHTML('beforeend',`<div class="overview-reading">${views.slice(0,3).map((x,i)=>{const proof=(x.evidenceCommentIds||[]).map(id=>commentById.get(String(id))).find(Boolean);return `<article class="reading-item"><span class="asset-icon ${['asset-link','asset-gear','asset-layers'][i]}" aria-hidden="true"></span><div><h4>${esc(x.title||'观众需求')}</h4><p>${esc(x.summary||x.reason||'')}</p>${proof?`<blockquote>“${esc(shortText(proof.text,90))}”</blockquote>`:''}</div></article>`}).join('')||'<p>暂无已验证的需求解读。</p>'}<a class="reading-footer" href="#signals">基于 ${fmt(comments.length)} 条评论 · 查看评论区分析 →</a></div>`);
+      document.querySelectorAll('#workAnalyses .analysis').forEach(card=>{
+        const work=wMap.get(card.dataset.work),analysis=aMap.get(card.dataset.work);
+        const title=String(work?.title||analysis?.sourceTopic||'作品分析').split('#')[0].split(/[！!。\n]/)[0].trim();
+        card.querySelector('h3').textContent=shortText(title,36);
+        card.querySelector('h3').title=work?.title||title;
+        const conclusion=String(analysis?.summary||analysis?.targetAudienceProblem||'').split(/[。；\n]/).find(x=>x.trim());
+        if(conclusion){
+          const parts=conclusion.split(/[，,；;]/).map(x=>x.trim()).filter(Boolean);
+          const takeaway=parts[0],explanation=parts.slice(1).join('，');
+          card.querySelector('.analysis-body p').textContent=shortText(explanation||analysis?.targetAudienceProblem||'',80);
+          card.querySelector('h3').insertAdjacentHTML('afterend',`<span class="takeaway-label">拆解结论</span><strong class="takeaway-title">${esc(shortText(takeaway,32))}</strong>`);
+        }
+        card.querySelector('.evidence').innerHTML=`<span>${fmt((analysis?.goldenQuotes||[]).length)} 条金句 · 完整口播已验证</span><button class="analysis-open" type="button" data-work="${esc(card.dataset.work)}">查看完整分析 →</button>`;
+      });
+      document.querySelectorAll('#workAnalyses .analysis').forEach((card,index)=>{
+        const a=aMap.get(card.dataset.work),body=card.querySelector('.analysis-body');
+        const heading=document.createElement('header');heading.className='breakdown-row-heading';
+        heading.append(body.querySelector('.score-pill'));body.prepend(heading);
+        const beatText=beat=>{
+          if(typeof beat==='string')return beat;
+          if(!beat||typeof beat!=='object')return '';
+          return [...new Set([beat.label,beat.summary].filter(value=>typeof value==='string'&&value.trim()))].join('：');
+        };
+        const beats=(a?.structureBeats||[]).map(beatText).filter(Boolean).slice(0,3);
+        if(beats.length)body.insertAdjacentHTML('beforeend',`<div class="breakdown-beats">${beats.map((beat,i)=>`<div><b>${String(i+1).padStart(2,'0')}</b><p>${esc(beat)}</p></div>`).join('')}</div>`);
+        const proof=document.createElement('aside');proof.className='breakdown-proof';
+        const metrics=index===0?[['合格拆解',`${qualified.size} / ${(pageData.selectedWorks||[]).length||0}`],['口播金句',quoteCount],['内容段落',analyses.reduce((n,x)=>n+(x.structureBeats||[]).length,0)],['二创角度',(pageData.recreationAngles||[]).length]]:[['口播金句',(a?.goldenQuotes||[]).length],['内容段落',(a?.structureBeats||[]).length]];
+        proof.innerHTML=`<h4>${index===0?'分析报告':'证据与拆解'}</h4><dl>${metrics.map(([label,value])=>`<div><dt>${esc(label)}</dt><dd>${esc(angleText(value))}</dd></div>`).join('')}</dl>`;
+        const actions=document.createElement('div');actions.className='proof-actions';actions.append(body.querySelector('.analysis-open'));proof.append(actions);body.querySelector('.evidence').remove();card.append(proof);
+      });
+      const maxBreakdownRows=5;
+      [...document.querySelectorAll('#workAnalyses .analysis')].slice(maxBreakdownRows).forEach(card=>card.remove());
+      const displayedWorkIds=new Set([...document.querySelectorAll('#workAnalyses .analysis')].map(card=>card.dataset.work));
+      const selectedDisplay=(pageData.selectedWorks||[]).map(s=>wMap.get(String(s.awemeId))).filter(Boolean);
+      const additionalWorks=selectedDisplay.filter(w=>!displayedWorkIds.has(String(w.awemeId))).map(w=>({w,total:interactionTotal(w)}));
+      $('#workAnalyses').insertAdjacentHTML('beforeend',additionalWorks.map(({w,total})=>{
+        const related=comments.filter(c=>String(c.awemeId)===String(w.awemeId));
+        const cleanTitle=shortText(String(w.title||'作品分析').split('#')[0].split(/[！!。\n]/)[0].trim(),36);
+        const localCover=localCoverFallbacks[String(w.awemeId)]||`assets/${w.awemeId}-cover.jpg`;
+        const workAnalysis=aMap.get(String(w.awemeId)),isQualified=qualified.has(String(w.awemeId));
+        const metadataConclusion=`账号内高互动样本 · 排名 #${w.viralRank||'—'}`;
+        const metadataDetail=total===null?'互动数据待补齐，完整内容结论需等待合格口播转写。':`总互动 ${fmt(total)}，其中收藏 ${fmt(w.collectCount)}、分享 ${fmt(w.shareCount)}；完整内容结论需等待合格口播转写。`;
+        return `<article class="card analysis metadata-analysis" data-work="${esc(w.awemeId)}"><div class="analysis-cover"><img src="${esc(localCover)}" alt="${esc(cleanTitle)}作品封面" loading="lazy" onerror="this.remove()"><span class="analysis-rank">#${esc(w.viralRank||'—')}</span></div><div class="analysis-body"><header class="breakdown-row-heading"><span class="score-pill">爆款指数 ${Number(w.viralScore||0).toFixed(2)}</span></header><h3 title="${esc(w.title||'')}">${esc(cleanTitle)}</h3><span class="takeaway-label">拆解结论</span><strong class="takeaway-title">${esc(metadataConclusion)}</strong><p>${esc(metadataDetail)}</p><div class="breakdown-beats"><div><b>01</b><p>${date(w.publishedAt)} 发布，进入账号作品观察样本</p></div><div><b>02</b><p>当前总互动 ${total===null?'待补齐':fmt(total)}，收藏 ${fmt(w.collectCount)}</p></div><div><b>03</b><p>尚无合格完整转写，不生成口播结构、金句和内容级判断</p></div></div></div><aside class="breakdown-proof"><h4>拆解证据 · 单条作品</h4><dl><div><dt>合格拆解</dt><dd>${isQualified?'1 / 1':'0 / 1'}</dd></div><div><dt>口播金句</dt><dd>${(workAnalysis?.goldenQuotes||[]).length}</dd></div><div><dt>内容段落</dt><dd>${(workAnalysis?.structureBeats||[]).length}</dd></div></dl><div class="proof-actions"><button class="analysis-open" type="button" data-work="${esc(w.awemeId)}">查看作品数据 →</button></div></aside></article>`;
+      }).join(''));
+      const workContainer=$('#workAnalyses');
+      selectedDisplay.forEach(w=>{const card=[...workContainer.children].find(c=>c.dataset.work===String(w.awemeId));if(card)workContainer.append(card);});
+      [...workContainer.children].forEach(card=>{if(!selectedDisplay.some(w=>String(w.awemeId)===card.dataset.work))card.remove();});
+      if(!workContainer.children.length)workContainer.innerHTML='<div class="card empty">暂无入选作品；采集作品后可继续生成分析。</div>';
+      document.querySelectorAll('#workAnalyses .breakdown-proof .proof-status, #workAnalyses .breakdown-proof > small').forEach(el=>el.remove());
+      document.querySelectorAll('#workAnalyses .analysis').forEach(card=>{
+        const work=wMap.get(card.dataset.work),heading=card.querySelector('.breakdown-row-heading');
+        if(!work||!heading)return;
+        const scorePill=heading.querySelector('.score-pill');if(scorePill&&work.sourceUrl)scorePill.insertAdjacentHTML('afterend',`<a class="source-video-icon" href="${esc(work.sourceUrl)}" target="_blank" rel="noopener noreferrer" aria-label="打开原视频" title="打开原视频"><i data-lucide="external-link" aria-hidden="true"></i></a>`);
+        heading.insertAdjacentHTML('beforeend',`<div class="work-key-stats" aria-label="作品互动数据"><span class="work-key-stat"><i data-lucide="heart" aria-hidden="true"></i><small>点赞</small><b>${fmt(work.diggCount)}</b></span><span class="work-key-stat"><i data-lucide="bookmark" aria-hidden="true"></i><small>收藏</small><b>${fmt(work.collectCount)}</b></span><span class="work-key-stat"><i data-lucide="share-2" aria-hidden="true"></i><small>分享</small><b>${fmt(work.shareCount)}</b></span></div>`);
+      });
+      const gaugeRanking=works.map(w=>({w,total:interactionTotal(w)})).filter(x=>Number.isFinite(x.total)).sort((a,b)=>b.total-a.total);
+      [...document.querySelectorAll('#workAnalyses .analysis')].slice(0,1).forEach(card=>{
+        const index=gaugeRanking.findIndex(x=>String(x.w.awemeId)===card.dataset.work),entry=gaugeRanking[index];
+        if(!entry)return;
+        const rank=index+1,count=gaugeRanking.length;
+        const proof=card.querySelector('.breakdown-proof');
+        proof.querySelectorAll('h4,dl').forEach(el=>el.remove());
+        proof.insertAdjacentHTML('afterbegin',`<div class="work-performance"><div><span>总互动</span><strong>${fmt(entry.total)}</strong></div><span class="work-performance-rank">样本内第 <b>${rank}</b> 名 <small>/ ${count} 条</small></span></div>`);
+      });
+      // Shared three-panel comment dashboard.
+      $('#signals .section-head p').textContent='评论类型、高赞内容与用户需求画像';
+      fusion.className='signals';
+      fusion.innerHTML=`<article class="card signal-panel"><div class="signal-panel-head"><h3>评论类型分层（规则初筛）</h3><span>${fmt(signalTotal)} 条评论</span></div><div class="signal-donut-wrap"><div class="signal-donut"><svg viewBox="0 0 100 100">${signalSegments}</svg><b class="signal-donut-center">${fmt(signalTotal)}</b></div><div class="signal-legend">${layers.map((x,i)=>`<div class="signal-legend-row" style="--tone:${signalColors[i%signalColors.length]}"><i></i><span>${esc(x.name)}</span><b>${fmt(x.count)}</b></div>`).join('')}</div></div></article><article class="card signal-panel"><div class="signal-panel-head"><h3>高赞评论排行</h3><span>按点赞数降序</span></div><div class="like-chart">${liked.map((x,i)=>`<div><div class="like-label"><b>${String(i+1).padStart(2,'0')}</b><span title="${esc(x.text)}">${esc(x.text)}</span><strong>${fmt(x.diggCount)}</strong></div><div class="like-track"><i style="width:${Math.max((+x.diggCount||0)/maxLiked*100,4)}%"></i></div></div>`).join('')||'<div class="empty">暂无点赞数据</div>'}</div></article><article class="card signal-panel profile-signal-card"><div class="signal-panel-head"><h3>用户需求画像</h3><span>主画像 / 次级画像</span></div>${primaryKeyword?`<div class="profile-primary"><strong>${fmt(primaryKeyword.count)} 条</strong><h4>${esc(primaryKeyword.name)}</h4><p>评论中的高频词，需结合上下文解释</p></div>`:'<div class="empty">暂无需求信号</div>'}<div>${keywordRows.slice(1).map((x,i)=>`<div class="profile-secondary" style="--tone:${signalColors[(i+1)%signalColors.length]}"><i></i><span>${esc(x.name)}</span><b>${fmt(x.count)} 条</b></div>`).join('')}</div><p class="profile-note">信号数可能重叠，不代表人口属性。</p></article>`;
+      signalGridEl.remove();
+      function showCommentSet(title,list){$('.drawer-panel').classList.remove('work-detail');$('#drawer').classList.remove('work-open');$('.drawer-panel').onscroll=null;$('#drawerTitle').textContent=title;$('#drawerBody').innerHTML=list.length?list.map(c=>`<div class="drawer-block"><small>${esc(c.layer||'常规互动')} · ${fmt(c.diggCount)} 赞</small><p>${esc(c.text)}</p></div>`).join(''):'<div class="drawer-block"><p>当前尚未采集到该作品的评论。</p></div>';$('#drawer').classList.add('open');}
+      // Keep the next chapter out of a partially cropped desktop opening shot.
+      core.insertAdjacentHTML('beforeend','<svg class="core-reference-radar" viewBox="57 59 2058 609" preserveAspectRatio="none" aria-hidden="true"><image href="assets/ui/core-radar-smaller-v1.png" width="2172" height="724" /></svg>');
+      function frameOpeningShot(){const chapter=$('#breakdown');chapter.style.paddingBottom='';if(innerWidth>1180){const bottom=chapter.getBoundingClientRect().bottom+scrollY;chapter.style.paddingBottom=Math.max(0,innerHeight-bottom)+'px';}}
+      addEventListener('resize',frameOpeningShot,{passive:true});
+      addEventListener('load',frameOpeningShot,{once:true});
+      document.fonts.ready.then(frameOpeningShot);
+      if(accentAt>=0)$('#summary').innerHTML=`<span class="summary-line">${esc(insightHeadline.slice(0,accentAt))}</span><em class="summary-line">${esc(insightHeadline.slice(accentAt))}</em>`;
+      if(window.lucide)window.lucide.createIcons({attrs:{'stroke-width':1.85}});
+      // Ease light position toward the pointer; stop rendering once settled or outside.
+      const lightMotion=matchMedia('(hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference)');
+      let lightFrame=0,lightCard=null,lightX=0,lightY=0,currentLightX=0,currentLightY=0;
+      function drawCardLight(){
+        lightFrame=0;if(!lightCard||!lightMotion.matches)return;
+        currentLightX+=(lightX-currentLightX)*.22;currentLightY+=(lightY-currentLightY)*.22;
+        lightCard.style.setProperty('--light-x',`${currentLightX}px`);lightCard.style.setProperty('--light-y',`${currentLightY}px`);
+        if(Math.abs(lightX-currentLightX)+Math.abs(lightY-currentLightY)>.5)lightFrame=requestAnimationFrame(drawCardLight);
+      }
+      document.querySelectorAll('.shell .card,.shell .business-card,.shell .sample-kpi').forEach(card=>{
+        card.classList.add('light-surface');
+        if(!card.matches('#workAnalyses .analysis')){const layer=document.createElement('span');layer.className='card-light-layer';layer.setAttribute('aria-hidden','true');card.append(layer);}
+      });
+      $('.shell').addEventListener('pointermove',event=>{
+        if(!lightMotion.matches)return;
+        const card=event.target.closest('.light-surface');if(!card)return;
+        const bounds=card.getBoundingClientRect();lightX=event.clientX-bounds.left;lightY=event.clientY-bounds.top;
+        if(lightCard!==card){currentLightX=lightX;currentLightY=lightY;lightCard=card;}
+        if(!lightFrame)lightFrame=requestAnimationFrame(drawCardLight);
+      },{passive:true});
+      $('.shell').addEventListener('pointerleave',()=>{cancelAnimationFrame(lightFrame);lightFrame=0;lightCard=null;});
+      clearTimeout(window.__reportBootFallback);
+      requestAnimationFrame(()=>document.documentElement.classList.remove('report-booting'));
+    </script>
+  </body>
+</html>

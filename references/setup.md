@@ -1,6 +1,6 @@
 # 安装和配置
 
-交付物为 Codex Skill 与 Python 脚本。分析由运行 Skill 的 Codex 完成，脚本负责采集、转写、校验；无需另配大模型 API。
+交付物为 Codex Skill 与 Python 脚本，不含 AI 订阅、采集/转写服务额度。分析由运行 Skill 的 Codex 完成，脚本负责采集、转写、校验；无需另配大模型 API。
 
 ## 安装
 
@@ -22,7 +22,7 @@ python3 -m venv .venv
 
 后续示例中的 python 使用此虚拟环境解释器。用户只在本地编辑 `.env`，不要在聊天中粘贴密钥。环境变量优先于 `.env`；空值或 replace_ 占位不视为有效配置。
 
-在线分析配置 `TIKHUB_API_KEY` 和 `TIKHUB_BASE_URL`。本地媒体提取不需要 TikHub。评论数量是接口实际返回值，不能将请求上限当成获取量。
+在线分析配置 `TIKHUB_API_KEY` 和 `TIKHUB_BASE_URL`。本地媒体提取不需要 TikHub。采集接口按供应商计费，不承诺免费或固定费用。评论数量是接口实际返回值，不能将请求上限当成获取量。
 
 ## 本地文案提取
 
@@ -39,15 +39,16 @@ python scripts/doctor.py --mode local
 python scripts/transcribe_works.py --media "/absolute/path/video.mp4" --provider local --output-dir "/absolute/path/output"
 ```
 
-输出 spoken/*.txt、subtitles/*.srt、asr/*.json 和 transcription-manifest.json。出现 needs_review 时仍可查看原文，请人工核对识别内容。时间完整性不保证逐字准确，重复识别、缺失片段要人工复核。
+输出 spoken/*.txt、subtitles/*.srt、asr/*.json 和 transcription-manifest.json。出现 needs_review 时仍可查看原文，但不能当作已合格的深度分析证据。时间完整性不保证逐字准确，重复识别、缺失片段要人工复核。
 
-## 更新技能
+## 更新
 
-从新下载的包执行 `python install.py --upgrade`。安装器备份旧版本并保留 `.env`、`.venv` 与 workspace。
+从新下载的包执行 `python install.py --upgrade`。安装器备份旧版本，并保留 `.env`、`.venv` 与 workspace。
 
 ## 故障处理
 
 - doctor 只报告配置是否存在，不联网、不验证额度或密钥有效性。
 - 采集失败按输出中的 --resume 命令继续同一次运行；已成功响应复用，不覆盖旧报告。需要全新数据时不带 --resume。
 - 转写重复运行同一 --input，复用同账号、同作品、同服务、时长一致且通过质量检查的 manifest，不必等报告发布。需要重转时显式 --force-transcribe。
+- 云端与本地不会静默切换；检查服务、网络、额度后重试，或明确选择本地。
 - Windows 尚需在真实 Windows 环境完成验收；本包使用跨平台路径和子进程接口，不以静态检查替代实机测试。

@@ -22,7 +22,7 @@ def quality(text,utterances,duration):
     norm=lambda s:re.sub(r'[^\w\u4e00-\u9fff]','',s)
     counts=Counter(norm(u.get('text','')) for u in utterances)
     if any(len(t)>=5 and n>=4 for t,n in counts.items()):reasons.append('检测到重复识别，需人工核对')
-    if len(norm(text))<20:reasons.append('有效语音过少，需人工复核')
+    if len(norm(text))<20:reasons.append('有效语音过少，不进入深度拆解')
     return reasons
 
 def stamp(ms):
@@ -62,7 +62,8 @@ def extract_one(work,dest,choice):
         video=Path(tmp)/'video.mp4';audio=Path(tmp)/'audio.wav'
         if work.get('localMedia'):audio_from_video(Path(work['localMedia']),audio)
         else:prepare_audio(work,wid,video,audio)
-        from local_asr import transcribe
+        if choice=='cloud':from cloud_asr import transcribe
+        else:from local_asr import transcribe
         response,headers,request=transcribe(audio)
     result=response.get('result',{});text=result.get('text','').strip();utterances=result.get('utterances',[])
     reasons=quality(text,utterances,float(work.get('durationSeconds') or 0));now=datetime.now(timezone.utc).isoformat()
@@ -71,7 +72,7 @@ def extract_one(work,dest,choice):
 
 def main():
     ap=argparse.ArgumentParser();g=ap.add_mutually_exclusive_group(required=True);g.add_argument('--input',type=Path);g.add_argument('--media',type=Path)
-    ap.add_argument('--output-dir',type=Path);ap.add_argument('--provider',choices=['local']);ap.add_argument('--force-transcribe',action='store_true');args=ap.parse_args()
+    ap.add_argument('--output-dir',type=Path);ap.add_argument('--provider',choices=['local','cloud']);ap.add_argument('--force-transcribe',action='store_true');args=ap.parse_args()
     choice=provider(args.provider);check=inspect(choice)
     if not check['ok']:raise PipelineError('环境未就绪：'+', '.join(check['missing'])+'；参阅 references/setup.md')
     if args.media:
@@ -89,11 +90,11 @@ def main():
     reuse={w['awemeId']:cached(inp,account,w,choice,dest) for w in works} if not args.force_transcribe else {}
     rows=[]
     for i,w in enumerate(works,1):
-        print(f"[{i}/{len(works)}] 本地文案提取：{w.get('title') or w['awemeId']}",file=sys.stderr)
+        print(f"[{i}/{len(works)}] {'高速文案提取' if choice=='cloud' else '本地文案提取'}：{w.get('title') or w['awemeId']}",file=sys.stderr)
         try:row=reuse.get(w['awemeId']) or extract_one(w,dest,choice)
         except Exception as e:
             # Never persist remote responses, credentials, or signed URLs in diagnostic text.
-            row={'referenceId':w['awemeId'],'provider':choice,'status':'failed','transcriptComplete':False,'sourceKind':'metadata_only','error':type(e).__name__,'nextAction':'检查本地模型、音频工具或媒体文件；修复后重跑本命令。'}
+            row={'referenceId':w['awemeId'],'provider':choice,'status':'failed','transcriptComplete':False,'sourceKind':'metadata_only','error':type(e).__name__,'nextAction':'检查所选转写服务、凭据、额度、依赖或媒体；修复后重跑本命令。不会自动切换服务。'}
         row['selectionRole']=next((s.get('selectionRole') for s in data.get('selectedWorks',[]) if s['awemeId']==w['awemeId']),None) if args.input else 'local'
         rows.append(row);atomic_json(dest/'transcription-manifest.json',{'accountId':account,'works':rows})
     print(json.dumps({'manifest':str(dest/'transcription-manifest.json'),'completed':sum(r['status']=='completed' for r in rows),'needsReview':sum(r['status']=='needs_review' for r in rows),'failed':sum(r['status']=='failed' for r in rows),'reused':sum(bool(r.get('reused')) for r in rows)},ensure_ascii=False))

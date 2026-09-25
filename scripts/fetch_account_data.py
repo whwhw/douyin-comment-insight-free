@@ -13,7 +13,7 @@ from runtime import load_env as load_project_env
 load_project_env()
 
 BASE='https://api.tikhub.io'
-SEARCH='/api/v1/douyin/search/fetch_user_search'
+SEARCH='/api/v1/douyin/search/fetch_user_search_v2'
 PROFILE='/api/v1/douyin/app/v3/handler_user_profile'
 POSTS='/api/v1/douyin/app/v3/fetch_user_post_videos'
 COMMENTS='/api/v1/douyin/app/v3/fetch_video_comments'
@@ -83,6 +83,25 @@ def user_value(u,*keys):
         if u.get(k) not in (None,''): return u[k]
     return ''
 
+def resolve_user(payload,account,token):
+    try:return first_user(payload,account)
+    except RuntimeError:pass
+    # Search summaries can omit the account handle. Verify candidate profiles,
+    # never use rank or nickname as proof of identity.
+    seen=set();matches=[]
+    for candidate in walk(payload):
+        sec=user_value(candidate,'sec_uid','sec_user_id','user_id')
+        if not sec or sec in seen or not (candidate.get('nickname') or candidate.get('nick_name')):continue
+        if len(seen)>=3:break
+        seen.add(sec)
+        profile=request(PROFILE,token,params={'sec_user_id':sec})
+        for row in walk(profile):
+            handle=str(row.get('unique_id') or row.get('short_id') or '').strip()
+            if handle==account:
+                matches.append({**candidate,**row,'sec_uid':sec});break
+    if len(matches)==1:return matches[0]
+    raise RuntimeError(f'无法唯一核验抖音号：{account}；请提供真实抖音号或可核验主页信息')
+
 def avatar_value(user):
     """Read both legacy flat avatar URLs and TikHub's nested url_list fields."""
     direct=user_value(user,'avatar_url')
@@ -123,8 +142,8 @@ def main():
     args.out.mkdir(parents=True,exist_ok=True)
     CACHE_DIR=args.out/'request-cache';CACHE_DIR.mkdir(exist_ok=True)
     started=datetime.now(timezone.utc).isoformat(); result={'accountId':args.account,'startedAt':started,'source':{'provider':'TikHub','commentLevel':'一级评论'},'warnings':[],'errors':[]}
-    search=request(SEARCH,token,method='POST',body={'keyword':args.account,'cursor':0,'douyin_user_fans':'','douyin_user_type':'','search_id':''}); (args.out/'search.json').write_text(json.dumps(search,ensure_ascii=False,indent=2))
-    user=first_user(search,args.account); sec=user_value(user,'sec_uid','sec_user_id','user_id');
+    search=request(SEARCH,token,method='POST',body={'keyword':args.account,'cursor':0}); (args.out/'search.json').write_text(json.dumps(search,ensure_ascii=False,indent=2))
+    user=resolve_user(search,args.account,token); sec=user_value(user,'sec_uid','sec_user_id','user_id');
     if not sec: raise RuntimeError(f'账号缺少 sec_user_id：{args.account}')
     prof=request(PROFILE,token,params={'sec_user_id':sec}); (args.out/'profile.json').write_text(json.dumps(prof,ensure_ascii=False,indent=2))
     p=next((x for x in walk(prof) if x.get('nickname') or x.get('nick_name')),user)

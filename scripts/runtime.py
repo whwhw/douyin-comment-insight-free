@@ -28,6 +28,6 @@ def present(key):
     return bool(v and not v.startswith(('replace_','your_','<')))
 
 def provider(requested=None):
-    choice=requested or os.getenv('ASR_PROVIDER') or 'local'
-    if choice!='local':raise ValueError('ASR_PROVIDER 只能是 local')
+    choice=requested or os.getenv('ASR_PROVIDER') or 'cloud'
+    if choice not in ('local','cloud'):raise ValueError('ASR_PROVIDER 只能是 local 或 cloud')
     return choice

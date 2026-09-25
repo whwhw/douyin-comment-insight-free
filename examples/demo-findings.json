@@ -1,6 +1,12 @@
 {
   "lane": "工具教程",
   "summary": "虚构评论主要关注工具领取、安装教程和 Windows 兼容性。",
+  "metrics": {
+    "comments": 5,
+    "highValueSignals": 4,
+    "needClusters": 2,
+    "highPotential": 1
+  },
   "viewpoints": [
     {
       "id": "demo-vp-install",
@@ -13,5 +19,9 @@
       ],
       "confidence": "高"
     }
-  ]
+  ],
+  "run": {
+    "status": "completed",
+    "completedAt": "2026-01-01T00:00:00+00:00"
+  }
 }

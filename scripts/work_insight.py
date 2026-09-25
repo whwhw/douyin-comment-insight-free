@@ -14,6 +14,13 @@ from typing import Any
 
 
 METRICS = ("diggCount", "commentCount", "collectCount", "shareCount")
+DIRECT_DERIVATIONS = {
+    "new_example_same_mechanism",
+    "new_scene_same_problem",
+    "new_format_same_argument",
+    "comparison_with_new_proof",
+}
+DERIVATIONS = DIRECT_DERIVATIONS | {"cross_source_synthesis"}
 
 
 def first_url(value: Any) -> str:
@@ -136,5 +143,97 @@ def build_work_payload(raw_works: list[dict[str, Any]], observed_at: str) -> dic
         "works": scored,
         "viralWorks": [row for row in scored if row["isAccountViral"]][:5],
         "latestWorks": latest[:5],
-        "selectedWorks": select_samples(scored, limit=1),
+        "selectedWorks": select_samples(scored),
     }
+
+
+def useful_text(value: str) -> str:
+    return re.sub(r"[\s#\[\]0-9:：.,，。!！?？\-]+", "", value or "")
+
+
+def validate_work_evidence(analysis: dict[str, Any], base_dir: Path) -> list[str]:
+    errors: list[str] = []
+    works = {str(row.get("awemeId")): row for row in analysis.get("works", [])}
+    qualified = set(map(str, analysis.get("qualifiedWorkIds", [])))
+    work_analyses = {str(row.get("referenceId") or row.get("reference_id")): row for row in analysis.get("workAnalyses", [])}
+    unknown_analyses = sorted(set(work_analyses) - set(works))
+    if unknown_analyses:
+        errors.append("work analyses reference unknown works: " + ", ".join(unknown_analyses))
+    transcripts: dict[str, str] = {}
+    for aweme_id in qualified:
+        row = work_analyses.get(aweme_id)
+        if not row:
+            errors.append(f"qualified work missing analysis: {aweme_id}")
+            continue
+        if row.get("sourceKind") not in {"full_asr", "platform_subtitle"} or row.get("transcriptComplete") is not True:
+            errors.append(f"work is not transcript-qualified: {aweme_id}")
+        required_analysis = ("sourceTopic", "targetAudienceProblem", "coreTension", "structureBeats", "proofSequence", "retentionDevice", "cta", "transformableVariables", "prohibitedCopyElements")
+        missing_fields = [field for field in required_analysis if row.get(field) in (None, "", [])]
+        if missing_fields:
+            errors.append(f"work analysis incomplete {aweme_id}: {', '.join(missing_fields)}")
+        path_value = str(row.get("spokenScriptPath") or "")
+        path = Path(path_value)
+        if not path.is_absolute():
+            path = (base_dir / path).resolve()
+        if not path.exists():
+            errors.append(f"spoken transcript missing: {aweme_id}")
+            continue
+        transcript = path.read_text(encoding="utf-8", errors="ignore").strip()
+        transcripts[aweme_id] = transcript
+        asr_value = str(row.get("asrMetadataPath") or "")
+        asr_path = Path(asr_value)
+        if not asr_path.is_absolute():
+            asr_path = (base_dir / asr_path).resolve()
+        if not asr_value or not asr_path.exists():
+            errors.append(f"ASR metadata missing: {aweme_id}")
+        else:
+            try:
+                asr = json.loads(asr_path.read_text(encoding="utf-8"))
+                if any(not asr.get(field) for field in ("provider", "status", "completedAt")):
+                    errors.append(f"ASR metadata incomplete: {aweme_id}")
+                if asr.get('status') != 'completed':
+                    errors.append(f"ASR is not completed: {aweme_id}")
+                expected = float(works.get(aweme_id, {}).get('durationSeconds') or 0)
+                utterances = asr.get('utterances') or []
+                ending = max((float(u.get('end_time') or 0) for u in utterances), default=0) / 1000
+                if expected and utterances and ending < expected - max(10, expected * .05):
+                    errors.append(f"ASR ending too early; completeness review required: {aweme_id}")
+            except (OSError, ValueError):
+                errors.append(f"ASR metadata invalid: {aweme_id}")
+        duration = float(works.get(aweme_id, {}).get("durationSeconds") or 0)
+        minimum = 60 if 0 < duration <= 30 else 120
+        if len(useful_text(transcript)) < minimum:
+            errors.append(f"transcript too short: {aweme_id}")
+        for quote in row.get("goldenQuotes", []):
+            text = str(quote.get("text") if isinstance(quote, dict) else quote)
+            normalize_quote = lambda s: ''.join(c for c in s if not c.isspace() and not unicodedata.category(c).startswith('P'))
+            if normalize_quote(text) not in normalize_quote(transcript):
+                errors.append(f"golden quote absent from transcript: {aweme_id}")
+            if isinstance(quote, dict) and quote.get('rawText') and normalize_quote(text) != normalize_quote(quote['rawText']):
+                errors.append(f"punctuated quote changes original words: {aweme_id}")
+        opening = str(row.get("openingHook") or "")
+        if opening and useful_text(opening) not in useful_text(transcript):
+            errors.append(f"opening hook absent from transcript: {aweme_id}")
+    direct_usage: Counter[str] = Counter()
+    for index, angle in enumerate(analysis.get("recreationAngles", []), 1):
+        refs = [str(value) for value in angle.get("referenceIds", [])]
+        derivation = str(angle.get("derivationType") or "")
+        if derivation not in DERIVATIONS:
+            errors.append(f"recreation angle {index} has invalid derivation")
+        if not refs or any(ref not in qualified for ref in refs):
+            errors.append(f"recreation angle {index} cites unqualified work")
+        if derivation == "cross_source_synthesis" and len(set(refs)) < 2:
+            errors.append(f"recreation angle {index} synthesis needs two sources")
+        if derivation in DIRECT_DERIVATIONS:
+            for ref in refs:
+                direct_usage[ref] += 1
+        required = ("motherTopic", "preservedElements", "changedElements", "newProofPlan", "proofRequirement")
+        if any(not angle.get(field) for field in required):
+            errors.append(f"recreation angle {index} is incomplete")
+        forbidden = " ".join(str(angle.get(field) or "") for field in ("titleDirection", "angle", "summary"))
+        if any(phrase in forbidden for phrase in ("适合你的账号", "根据你的粉丝", "结合你的历史爆款")):
+            errors.append(f"recreation angle {index} makes unsupported personalization claim")
+    for ref, count in direct_usage.items():
+        if count > 2:
+            errors.append(f"work supports more than two direct recreations: {ref}")
+    return errors
