@@ -1139,7 +1139,7 @@ body::before {
   letter-spacing: .01em
 }
 .shell .stats>.run-note {
-  
+
 }
 @supports not (backdrop-filter:blur(1px)) {
   .shell .card,
@@ -1416,7 +1416,7 @@ body {
   background: url("page-background-user-1a2b851b.png") center top/cover no-repeat fixed #081117
 }
 body {
-  
+
 }
 .shell .dashboard > .stats {
   padding: 24px 26px;
@@ -1455,10 +1455,10 @@ body {
 }
 .shell .stats .metric:first-child,
 .shell .stats .metric:last-child {
-  
+
 }
 .shell .stats .metric:last-child {
-  
+
 }
 .shell .stats .metric + .metric {
   border-left: 1px solid rgba(162,190,204,.12)

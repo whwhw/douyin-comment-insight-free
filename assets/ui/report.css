@@ -1338,7 +1338,7 @@ html {
   font-size: 13px
 }
 .chapter-nav a {
-  
+
 }
 .profile h1 {
   font-size: clamp(38px,3vw,52px);
@@ -1906,7 +1906,7 @@ html {
     grid-template-columns: 1fr
   }
   .dashboard {
-    
+
   }
   .chapter-nav a {
     display: flex
@@ -2396,7 +2396,7 @@ html {
   }
   .chapter-nav a.active .nav-label,
   .chapter-nav a:hover .nav-label {
-    
+
   }
   .nav-foot {
     margin-top: auto;
@@ -2552,7 +2552,7 @@ html {
   box-shadow: none
 }
 #breakdown .viz-stat:not(:last-child) {
-  
+
 }
 #breakdown .viz-stat small {
   color: #9fb2bc;
@@ -2742,7 +2742,7 @@ html {
 }
 #evidence .comment:focus-visible .comment-text,
 #evidence .comment:hover .comment-text {
-  
+
 }
 #evidence .comment:focus-visible {
   outline: rgba(105,224,208,.55) solid 1px;
@@ -3031,7 +3031,7 @@ html {
   padding: 22px
 }
 #signals .signal-panel {
-  
+
 }
 #signals .profile-signal-card {
   display: grid;
@@ -3167,7 +3167,7 @@ html {
   align-items: center
 }
 .overview-fusion .layer-summary-card .signal-donut-wrap {
-  
+
 }
 .overview-fusion .layer-summary-card .signal-donut {
   position: relative;
@@ -3464,7 +3464,7 @@ html {
   gap: 28px
 }
 #workAnalyses .analysis-cover {
-  
+
 }
 #workAnalyses .analysis-body {
   padding: 26px 30px 24px 0
@@ -3866,7 +3866,7 @@ body:after {
     grid-template-columns: 1fr!important
   }
   #workAnalyses .analysis {
-    
+
   }
   #workAnalyses .analysis-cover {
     min-height: 220px
@@ -3975,7 +3975,7 @@ body:after {
   box-shadow: none!important
 }
 .diagnostic-grid .hero article:first-child::after {
-  
+
 }
 .diagnostic-grid .hero .eyebrow {
   position: relative;
@@ -5088,7 +5088,7 @@ body {
   align-items: center
 }
 #signals .signals .profile-signal-card {
-  
+
 }
 #signals .signals .profile-signal-card .profile-primary {
   align-self: center;
@@ -6362,7 +6362,7 @@ html {
 }
 #workAnalyses .analysis:not(:first-child) .breakdown-proof,
 #workAnalyses .analysis:not(:first-child) .work-key-stats {
-  
+
 }
 #workAnalyses .analysis:first-child .breakdown-proof {
   border-left-color: rgba(255,255,255,.1)

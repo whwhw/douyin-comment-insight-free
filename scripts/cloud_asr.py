@@ -28,4 +28,3 @@ def transcribe(audio: Path) -> tuple[dict, dict[str, str], str]:
     if not isinstance(text, str) or not text.strip():
         raise PipelineError("Volcengine ASR returned no speech")
     return response, response_headers, request_id
-
